@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-OWNER="weareadaptive"
+OWNER="jaypond"
 REPO="asdf-caf-scripts"
 GITHUB_REPO_URL="https://github.com/${OWNER}/${REPO}"
 GITHUB_API_URL="https://api.github.com"
@@ -72,7 +72,7 @@ install_version() {
 
 check_version() {
 	local install_type="$1"
-	local version="$2"
+	local version="$1"
 	local allowed_pattern='^[a-zA-Z0-9._-]+$'
 
     if [ "$install_type" == "ref"] && [[ ! "$version" =~ $allowed_pattern ]]; then
