@@ -10,6 +10,7 @@ source "${plugin_dir}/lib/utils.bash"
 
 # Check version for special characters
 check_version "$ASDF_INSTALL_VERSION"
+echo "$ASDF_INSTALL_VERSION"
 
 mkdir -p "$ASDF_DOWNLOAD_PATH"
 
