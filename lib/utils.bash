@@ -75,7 +75,7 @@ install_version() {
 
 check_version() {
 	local version="$1"
-	local allowed_pattern='^[a-zA-Z0-9_-]+$'
+	local allowed_pattern='^[a-zA-Z0-9._-]+$'
 
     if [[ ! "$version" =~ $allowed_pattern ]]; then
         echo "Error: Version '$version' contains special characters which is not supported"
