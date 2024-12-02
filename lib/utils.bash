@@ -2,7 +2,10 @@
 
 set -euo pipefail
 
-GITHUB_REPO="https://github.com/weareadaptive/asdf-caf-scripts"
+OWNER="jaypond"
+REPO="asdf-caf-scripts"
+GITHUB_REPO_URL="https://github.com/${OWNER}/${REPO}"
+GITHUB_API_URL="https://api.github.com"
 TOOL_NAME="caf-scripts"
 RELEASE_NAME="asdf-caf-scripts"
 
@@ -36,25 +39,28 @@ list_all_versions() {
 }
 
 download_release() {
-	local version filename url
-	version="$1"
-	filename="$2"
+	local install_type="$1"
+	local version="$2"
+	local filename="$3"
+	local url
+
+	formatted_version=$(printf "$version" | jq -sRr @uri)
+
+	if [ "$install_type" == "version" ]; then
+		url="${GITHUB_REPO_URL}/archive/refs/tags/v${version#v}.tar.gz"
+	else
+		url="${GITHUB_API_URL}/repos/${OWNER}/${REPO}/tarball/${formatted_version}"
+	fi
 
 	# TODO: Adapt the release URL convention for <YOUR TOOL>
-	url="$GITHUB_REPO/archive/refs/tags/v${version}.tar.gz"
-
 	echo "* Downloading $TOOL_NAME release $version..."
-	curl -fsSL -o "$filename" -C - "$url" || fail "Could not download $url"
+	curl -fsSL "$url" -C - -o $filename || fail "Could not download $url"
 }
 
 install_version() {
 	local install_type="$1"
 	local version="$2"
 	local install_path="${3%/bin}/bin"
-
-	if [ "$install_type" != "version" ]; then
-		fail "asdf-$TOOL_NAME supports release installs only"
-	fi
 
 	(
 		mkdir -p "$install_path"
@@ -65,4 +71,14 @@ install_version() {
 		rm -rf "$install_path"
 		fail "An error occurred while installing $TOOL_NAME $version."
 	)
+}
+
+check_version() {
+	local version="$1"
+	local allowed_pattern='^[a-zA-Z0-9_-]+$'
+
+    if [[ ! "$version" =~ $allowed_pattern ]]; then
+        echo "Error: Version '$version' contains special characters which is not supported"
+        exit 1
+    fi
 }
